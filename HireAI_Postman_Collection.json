@@ -1,0 +1,493 @@
+{
+  "info": {
+    "name": "HireAI Recruitment API",
+    "_postman_id": "hireai-recruitment-api-v1",
+    "description": "Complete API collection for the HireAI AI-Powered Smart Recruitment & Talent Management System.\n\nBase URL: http://localhost:8080\n\n**Quick Start:**\n1. Import this collection.\n2. Create a Postman Environment with variables: `baseUrl` and `token`.\n3. Run **Auth / Login** to auto-populate `{{token}}`.\n4. All authenticated endpoints use `Bearer {{token}}`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "jobId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "appId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "candidateId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"fullName\": \"New User\",\n  \"role\": \"CANDIDATE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user. Role must be CANDIDATE or RECRUITER."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.environment.set(\"token\", pm.response.json().token);",
+                  "  pm.environment.set(\"userId\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recruiter@demo.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login and receive a JWT token. The test script automatically stores the token and userId in environment variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User (me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Returns the currently authenticated user's details."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "List All Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/jobs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "jobs"]
+            },
+            "description": "Returns all active job postings. No authentication required."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Job by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/jobs/{{jobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "jobs", "{{jobId}}"]
+            },
+            "description": "Returns a single job posting by its ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior Software Engineer\",\n  \"description\": \"We are looking for a Senior Software Engineer to join our core platform team. You will design, build, and maintain scalable backend services.\",\n  \"requirements\": \"5+ years of Java experience. Strong microservices background. Ability to mentor junior developers.\",\n  \"skillsRequired\": \"Java, Spring Boot, Microservices, MySQL, Docker, REST APIs\",\n  \"experienceRequired\": 5,\n  \"location\": \"Bangalore, India (Hybrid)\",\n  \"jobType\": \"FULL_TIME\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/jobs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "jobs"]
+            },
+            "description": "Create a new job posting. Requires RECRUITER role."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Job",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior Software Engineer (Updated)\",\n  \"description\": \"Updated description here.\",\n  \"requirements\": \"Updated requirements.\",\n  \"skillsRequired\": \"Java, Spring Boot, Kubernetes\",\n  \"experienceRequired\": 6,\n  \"location\": \"Remote\",\n  \"jobType\": \"FULL_TIME\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/jobs/{{jobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "jobs", "{{jobId}}"]
+            },
+            "description": "Update an existing job posting. Only the recruiter who created it can update."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Job",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/jobs/{{jobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "jobs", "{{jobId}}"]
+            },
+            "description": "Delete a job posting. Only the recruiter who created it can delete."
+          },
+          "response": []
+        },
+        {
+          "name": "My Jobs (Recruiter)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/jobs/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "jobs", "my"]
+            },
+            "description": "Returns all jobs posted by the currently authenticated recruiter."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Applications",
+      "item": [
+        {
+          "name": "Apply for a Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/applications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "applications"]
+            },
+            "description": "Submit an application for a job. Requires CANDIDATE role."
+          },
+          "response": []
+        },
+        {
+          "name": "My Applications (Candidate)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/applications/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "applications", "my"]
+            },
+            "description": "Returns all applications submitted by the currently authenticated candidate."
+          },
+          "response": []
+        },
+        {
+          "name": "Applications for Job (Recruiter)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/applications/job/{{jobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "applications", "job", "{{jobId}}"]
+            },
+            "description": "Returns all applications for a specific job. Requires RECRUITER role."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Application Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INTERVIEW\",\n  \"notes\": \"Strong candidate — schedule technical interview round.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/applications/{{appId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "applications", "{{appId}}", "status"]
+            },
+            "description": "Update the status of an application. Valid statuses: APPLIED, SCREENING, INTERVIEW, OFFERED, REJECTED. Requires RECRUITER role."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Candidates",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/candidates/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "candidates", "profile"]
+            },
+            "description": "Returns the profile of the currently authenticated candidate."
+          },
+          "response": []
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": \"Java, Spring Boot, React, MySQL, Docker\",\n  \"experienceYears\": 4,\n  \"education\": \"B.Tech Computer Science, IIT Delhi\",\n  \"phone\": \"+91-9876543210\",\n  \"linkedinUrl\": \"https://linkedin.com/in/johndoe\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/candidates/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "candidates", "profile"]
+            },
+            "description": "Update the currently authenticated candidate's profile."
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Resume",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Select a PDF or text resume file"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/candidates/upload-resume",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "candidates", "upload-resume"]
+            },
+            "description": "Upload a resume file (PDF or plain text). The backend extracts text and stores it for AI processing."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "AI Features",
+      "item": [
+        {
+          "name": "Analyze Resume",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"candidateId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/analyze-resume",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ai", "analyze-resume"]
+            },
+            "description": "Triggers Gemini AI analysis of the candidate's uploaded resume. Returns skills extracted, strengths, weaknesses, and an overall score."
+          },
+          "response": []
+        },
+        {
+          "name": "Match Job to Candidate",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"candidateId\": 1,\n  \"jobId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/match-job",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ai", "match-job"]
+            },
+            "description": "Scores how well a candidate matches a job description using Gemini AI. Returns a match percentage and reasoning."
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Interview Questions",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": 1,\n  \"candidateId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/interview-questions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ai", "interview-questions"]
+            },
+            "description": "Generates a tailored set of interview questions using Gemini AI, based on the job requirements and candidate's profile."
+          },
+          "response": []
+        },
+        {
+          "name": "Improve Resume",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"candidateId\": 1,\n  \"jobId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/improve-resume",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ai", "improve-resume"]
+            },
+            "description": "Returns actionable AI suggestions to improve the candidate's resume specifically for the target job."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Stored Analysis",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/analysis/{{candidateId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ai", "analysis", "{{candidateId}}"]
+            },
+            "description": "Returns the most recent stored AI analysis for the given candidate."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Recruiter Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "analytics", "dashboard"]
+            },
+            "description": "Returns aggregated recruitment metrics for the authenticated recruiter: total jobs, total applications, status breakdown, and per-job application counts."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
